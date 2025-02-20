@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="Viska_Canvas" width="640" height="480"
+style="border:1px black solid"></canvas>
+ <script type="text/javascript">
+ //mengambil context dari elemen html dengan id Viska_Canvas
+ var ctx =
+document.getElementById("Viska_Canvas").getContext("2d");
+ //menentukan ukuran dan jenis font yang akan dipakai
+ ctx.font = '20px Consolas';
+ //menggambar teks dengan isian yang bertuliskan Hello world dan
+ //dengan titik koordinat (20,30)
+ ctx.strokeText('Hello world', 20, 50);
+ //menggambar teks dengan isian yang bertuliskan Hello world dan
+ //dengan titik koordinat (20, 150)
+ ctx.fillText('Hello world', 20, 150);
+ //membuat garis berwarna jingga di posisi 320
+ ctx.strokeStyle = "orange";
+ ctx.moveTo(320, 20);
+ ctx.lineTo(320, 170);
+ ctx.stroke();
+ //menentukan ukuran dan jeinis font yang akan dipakai
+ ctx.font = "15px Arial";
+ //menampilkan perbedaan dari tiap-tiap nilai atribut textAlign
+ ctx.textAlign = "start";
+ ctx.fillText("textAlign = start", 320, 60);
+ ctx.textAlign = "end";
+ ctx.fillText("textAlign = end", 320, 80);
+ ctx.textAlign = "left";
+ ctx.fillText("textAlign = left", 320, 100);
+ ctx.textAlign = "center";
+ ctx.fillText("textAlign = center", 320, 120);
+ ctx.textAlign = "right";
+ ctx.fillText("textAlign = right", 320, 140);
+
+ //membuat garis berwarna jingga di posisi y=300
+ ctx.moveTo(5, 300);
+ ctx.lineTo(425, 300);
+ ctx.stroke();
+ //tempatkan semua teks untuk titik y=300 dengan
+ //nilai textBaseline berbeda-beda
+ ctx.textBaseline = "alphabetic";
+ ctx.fillText("Alphabetic", 80, 300);
+
+ ctx.textBaseline = "top";
+ ctx.fillText("Top", 120, 300);
+ ctx.textBaseline = "hanging";
+ ctx.fillText("Hanging", 200, 300);
+ ctx.textBaseline = "middle";
+ ctx.fillText("Middle", 260, 300);
+ ctx.textBaseline = "ideographic";
+ ctx.fillText("Ideographic", 360, 300);
+ ctx.textBaseline = "bottom";
+ ctx.fillText("Bottom", 420, 300);
+
+ //membuat teks "Halo Dunia!"
+ ctx.fillText("Halo Dunia!", 550, 50);
+ //membuat teks "Halo Dunia!" agar objek berikutnya
+ //susunan karakternya berbalik menjadi "!Halo Dunia"
+ ctx.direction = "rtl";
+ ctx.fillText("Halo Dunia!", 550, 130)
+ 
+ </script>
+</body>
+</html>
+  

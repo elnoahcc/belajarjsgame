@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Shooter</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: poppins;
+            background-color: #222;
+            color: white;
+        }
+        canvas {
+            background-color: black;
+            display: block;
+            margin: 20px auto;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Game Shooter Sederhana</h1>
+    <p>Gunakan tombol kiri & kanan untuk bergerak, spasi untuk menembak</p>
+    <p id="score">Skor: 0</p> <!-- Score Display -->
+    <canvas id="gameCanvas" width="1024" height="768"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const scoreDisplay = document.getElementById("score");
+
+        let player = {
+            x: canvas.width / 2,
+            y: canvas.height - 100,
+            size: 40,
+            speed: 5
+        };
+
+        let enemy = {
+            x: Math.random() * (canvas.width - 200) + 100,
+            y: Math.random() * 100,
+            size: 50,
+            speed: 2
+        };
+
+        let bullets = [];
+        let score = 0;
+        let keys = {};
+        let canShoot = true; // Untuk cooldown tembakan
+
+        window.addEventListener("keydown", (e) => {
+            keys[e.code] = true;
+
+            // Tambahkan cooldown untuk tembakan
+            if (e.code === "Space" && canShoot) {
+                bullets.push({ 
+                    x: player.x, 
+                    y: player.y - player.size / 2,
+                    radius: 7, 
+                    speed: 7 
+                });
+                canShoot = false;
+                setTimeout(() => canShoot = true, 200); // Delay 200ms sebelum bisa menembak lagi
+            }
+        });
+
+        window.addEventListener("keyup", (e) => delete keys[e.code]);
+
+        function update() {
+            if (keys["ArrowLeft"] && player.x > 0) {
+                player.x -= player.speed;
+            }
+            if (keys["ArrowRight"] && player.x < canvas.width - player.size) {
+                player.x += player.speed;
+            }
+
+            bullets.forEach((bullet, index) => {
+                bullet.y -= bullet.speed;
+
+                if (
+                    bullet.y - bullet.radius < enemy.y + enemy.size &&
+                    bullet.x > enemy.x - enemy.size &&
+                    bullet.x < enemy.x + enemy.size
+                ) {
+                    bullets.splice(index, 1);
+                    score += 1;
+                    scoreDisplay.textContent = "Skor: " + score;
+
+                    enemy.x = Math.random() * (canvas.width - 200) + 100;
+                    enemy.y = Math.random() * 100;
+                }
+
+                if (bullet.y + bullet.radius < 0) {
+                    bullets.splice(index, 1);
+                }
+            });
+
+            enemy.y += enemy.speed;
+            enemy.x += (Math.random() - 0.5) * 2; // Musuh gerak horizontal
+
+            if (enemy.y > canvas.height) {
+                enemy.x = Math.random() * (canvas.width - 200) + 100;
+                enemy.y = Math.random() * 100;
+            }
+
+            // Game Over jika musuh menyentuh player
+            if (
+                enemy.y + enemy.size > player.y && 
+                enemy.x > player.x - player.size &&
+                enemy.x < player.x + player.size
+            ) {
+                alert("Game Over! Skor kamu: " + score);
+                document.location.reload();
+            }
+
+            draw();
+            requestAnimationFrame(update);
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "blue";
+            ctx.beginPath();
+            ctx.moveTo(player.x, player.y);
+            ctx.lineTo(player.x - player.size, player.y + player.size);
+            ctx.lineTo(player.x + player.size, player.y + player.size);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = "purple";
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                let angle = (Math.PI * 2 / 5) * i - Math.PI / 2;
+                let x = enemy.x + Math.cos(angle) * enemy.size;
+                let y = enemy.y + Math.sin(angle) * enemy.size;
+                ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = "red";
+            bullets.forEach(bullet => {
+                ctx.beginPath();
+                ctx.arc(bullet.x, bullet.y, bullet.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        update();
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="Viska_Canvas" width="640" height="480"
+   style="border: 1px solid black;"></canvas>
+    <script type="text/javascript">
+    //mengambil element canvas html dengan id Viska_Canvas
+    var canvas = document.getElementById("Viska_Canvas");
+    //mengambil context dari elemen canvas
+    var ctx = canvas.getContext("2d");
+    //membuat objek gambar
+    var gambar = new Image();
+    //path untuk gambar berupa folder dan nama gambar(offline)
+    gambar.src = "IMAGE/elnoah.jpg";
+    gambar.onload = function () {
+    //membuat gambar setelah image termuat dan
+    //sekaligus mengatur ukurannya menjadi 180x180
+    ctx.drawImage(gambar, 30, 30, 180, 180);
+    }
+    </script>
+    </body>
+</html>

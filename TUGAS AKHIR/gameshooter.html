@@ -9,157 +9,138 @@
 <body>
     <h1>BALL SHOOTER</h1>
     <p>Use the left & right keys to move, space to shoot</p>
-    <p id="score">Score: 0</p> <!-- Score Display -->
     <div style="display: flex; gap: 10px;">
-        <button type="button" onclick="location.href='pageStart.html'">Back Home</button>
-        <button type="button" onclick="gameshooter.html">Restart</button> <!-- Restart Button -->
-        <button type="button" id="pauseButton">Pause</button> <!-- Pause Button -->
+    <p id="score">Score: 0      </p> <!-- Score Display -->
+    <p id="highScore">High Score: 0</p> <!-- High Score Display -->
     </div>
+    
+    <div style="display: flex; gap: 10px; margin-right: 10dp;">
+        <button type="button" onclick="location.href='pageStart.html'">Back Home</button>
+        <button type="button" onclick="location.reload()">Restart</button> <!-- Restart Button -->
+        <button type="button" id="pauseButton">Pause</button> <!-- Pause Button -->
+    <button type="button" id="resetHighScore">Reset High Score</button> <!-- Reset High Score Button -->
+    </div>
+
     <canvas id="gameCanvas" width="1024" height="768"></canvas>
 
     <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-        const scoreDisplay = document.getElementById("score");
-        const pauseButton = document.getElementById("pauseButton");
+       let highScore = localStorage.getItem("highScore") || 0;
+document.getElementById("highScore").textContent = "High Score: " + highScore;
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const scoreDisplay = document.getElementById("score");
+const pauseButton = document.getElementById("pauseButton");
+const resetHighScoreButton = document.getElementById("resetHighScore");
 
-        let player = {
-            x: canvas.width / 2,
-            y: canvas.height - 100,
-            size: 40,
-            speed: 5
-        };
+let player = { x: canvas.width / 2, y: canvas.height - 100, size: 40, speed: 5 };
+let enemy = { x: Math.random() * (canvas.width - 200) + 100, y: Math.random() * 100, size: 50, speed: 2 };
+let bullets = [];
+let score = 0;
+let keys = {};
+let canShoot = true;
+let isPaused = false;
+let animationFrameId;
 
-        let enemy = {
-            x: Math.random() * (canvas.width - 200) + 100,
-            y: Math.random() * 100,
-            size: 50,
-            speed: 2
-        };
+window.addEventListener("keydown", (e) => {
+    keys[e.code] = true;
 
-        let bullets = [];
-        let score = 0;
-        let keys = {};
-        let canShoot = true; // For shooting cool down
-        let isPaused = false; // Pause state
+    if (e.code === "Space" && canShoot && !isPaused) {
+        bullets.push({ x: player.x, y: player.y - player.size / 2, radius: 7, speed: 7 });
+        canShoot = false;
+        setTimeout(() => canShoot = true, 200);
+    }
+});
 
-        window.addEventListener("keydown", (e) => {
-            keys[e.code] = true;
+window.addEventListener("keyup", (e) => delete keys[e.code]);
 
-            // Add cool down for shooting
-            if (e.code === "Space" && canShoot && !isPaused) {
-                bullets.push({
-                    x: player.x,
-                    y: player.y - player.size / 2,
-                    radius: 7,
-                    speed: 7
-                });
-                canShoot = false;
-                setTimeout(() => canShoot = true, 200); // 200ms delay before shooting again
-            }
-        });
+pauseButton.addEventListener("click", () => {
+    isPaused = !isPaused;
+    pauseButton.textContent = isPaused ? "Resume" : "Pause";
+    if (!isPaused) update();
+});
 
-        window.addEventListener("keyup", (e) => delete keys[e.code]);
+resetHighScoreButton.addEventListener("click", () => {
+    localStorage.setItem("highScore", 0);
+    document.getElementById("highScore").textContent = "High Score: 0";
+});
 
-        pauseButton.addEventListener("click", () => {
-            isPaused = !isPaused;
-            pauseButton.textContent = isPaused ? "Resume" : "Pause";
-            if (!isPaused) {
-                update();
-            }
-        });
+function update() {
+    if (isPaused) return;
 
-        function update() {
-            if (isPaused) return;
+    if (keys["ArrowLeft"] && player.x > 0) player.x -= player.speed;
+    if (keys["ArrowRight"] && player.x < canvas.width - player.size) player.x += player.speed;
 
-            if (keys["ArrowLeft"] && player.x > 0) {
-                player.x -= player.speed;
-            }
-            if (keys["ArrowRight"] && player.x < canvas.width - player.size) {
-                player.x += player.speed;
-            }
+    bullets.forEach((bullet, index) => {
+        bullet.y -= bullet.speed;
 
-            bullets.forEach((bullet, index) => {
-                bullet.y -= bullet.speed;
-
-                if (
-                    bullet.y - bullet.radius < enemy.y + enemy.size &&
-                    bullet.x > enemy.x &&
-                    bullet.x < enemy.x + enemy.size
-                ) {
-                    bullets.splice(index, 1);
-                    score += 1;
-                    scoreDisplay.textContent = "Score: " + score;
-
-                    enemy.x = Math.random() * (canvas.width - 200) + 100;
-                    enemy.y = Math.random() * 100;
-                }
-
-                if (bullet.y + bullet.radius < 0) {
-                    bullets.splice(index, 1);
-                }
-            });
-
-            enemy.y += enemy.speed;
-            // Keep enemy within canvas bounds
-            if (enemy.x < 0) {
-                enemy.x = 0;
-            } else if (enemy.x > canvas.width - enemy.size) {
-                enemy.x = canvas.width - enemy.size;
-            }
-
-            if (enemy.y > canvas.height) {
-                enemy.x = Math.random() * (canvas.width - 200) + 100;
-                enemy.y = Math.random() * 100;
-            }
-
-            // Game Over if enemy touches player
-            if (
-                enemy.y + enemy.size > player.y &&
-                enemy.x > player.x - player.size &&
-                enemy.x < player.x + player.size
-            ) {
-                window.location.href = "pagegameover.html"; // Redirect to pageStart.html
-            }
-
-            draw();
-            requestAnimationFrame(update);
+        if (
+            bullet.y - bullet.radius < enemy.y + enemy.size &&
+            bullet.x > enemy.x && bullet.x < enemy.x + enemy.size
+        ) {
+            bullets.splice(index, 1);
+            score++;
+            scoreDisplay.textContent = "Score: " + score;
+            updateHighScore(score);
+            enemy.x = Math.random() * (canvas.width - 200) + 100;
+            enemy.y = Math.random() * 100;
         }
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (bullet.y + bullet.radius < 0) bullets.splice(index, 1);
+    });
 
-            // Draw player
-            ctx.fillStyle = "deepskyblue";
-            ctx.beginPath();
-            ctx.moveTo(player.x, player.y);
-            ctx.lineTo(player.x - player.size, player.y + player.size);
-            ctx.lineTo(player.x + player.size, player.y + player.size);
-            ctx.closePath();
-            ctx.fill();
+    enemy.y += enemy.speed;
+    if (enemy.y > canvas.height) {
+        enemy.x = Math.random() * (canvas.width - 200) + 100;
+        enemy.y = Math.random() * 100;
+    }
 
-            // Draw enemy (Pac-Man shape)
-            ctx.fillStyle = "orange";
-            ctx.beginPath();
-            for (let i = 0; i < 5; i++) {
-                let angle = (Math.PI * 2 / 5) * i - Math.PI / 2;
-                let x = enemy.x + Math.cos(angle) * enemy.size;
-                let y = enemy.y + Math.sin(angle) * enemy.size;
-                ctx.lineTo(x, y);
-            }
-            ctx.closePath();
-            ctx.fill();
+    if (
+        enemy.y + enemy.size > player.y &&
+        enemy.x + enemy.size > player.x &&
+        enemy.x < player.x + player.size
+    ) {
+        updateHighScore(score);
+        cancelAnimationFrame(animationFrameId);
+        window.location.href = "pagegameover.html";
+    }
 
-            // Draw bullets
-            ctx.fillStyle = "red";
-            bullets.forEach(bullet => {
-                ctx.beginPath();
-                ctx.arc(bullet.x, bullet.y, bullet.radius, 0, Math.PI * 2);
-                ctx.fill();
-            });
-        }
+    draw();
+    animationFrameId = requestAnimationFrame(update);
+}
 
-        update();
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "deepskyblue";
+    ctx.beginPath();
+    ctx.moveTo(player.x, player.y);
+    ctx.lineTo(player.x - player.size, player.y + player.size);
+    ctx.lineTo(player.x + player.size, player.y + player.size);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = "orange";
+    ctx.beginPath();
+    ctx.arc(enemy.x, enemy.y, enemy.size / 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "red";
+    bullets.forEach(bullet => {
+        ctx.beginPath();
+        ctx.arc(bullet.x, bullet.y, bullet.radius, 0, Math.PI * 2);
+        ctx.fill();
+    });
+}
+
+function updateHighScore(score) {
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem("highScore", highScore);
+        document.getElementById("highScore").textContent = "High Score: " + highScore;
+    }
+}
+
+update();
     </script>
 </body>
 </html>

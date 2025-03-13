@@ -56,10 +56,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
+    
     <h1>GAME OVER</h1>
     <button onclick="location.href='gameshooter.html'">RESTART</button>
+    <button onclick="location.href='pagestart.html'">BACK HOME</button>
+    <canvas id="shootingStarsCanvas" style="position: fixed; top: 0; left: 0; z-index: -1;"></canvas>
     <script>
-        const canvas = document.getElementById('shootingStarsCanvas');
+         const canvas = document.getElementById('shootingStarsCanvas');
         const ctx = canvas.getContext('2d');
 
         canvas.width = window.innerWidth;

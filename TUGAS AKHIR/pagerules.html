@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html>
+<head>
+    <title>Game Rules - GameShooter</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+* {
+    padding: 0;
+    margin: 10dp;
+    box-sizing: border-box;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 10dp;
+    animation: neon 1.5s infinite alternate;
+}
+
+
+body {
+    text-align: center;
+    font-family: 'Press Start 2P', cursive;
+    background-color: #000;
+    color: #fff;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+button {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    font-family: 'Press Start 2P', cursive;
+    background-color: #ff0000;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+button:hover {
+    background-color: #cc0000;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Press Start 2P', cursive;
+    color: #ff00ff; /* Bright magenta color */
+}
+
+canvas {
+    background-color: #000;
+    display: block;
+    margin: 20px auto;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    canvas {
+        width: 90%;
+        height: auto;
+    }
+}
+    </style>
+</head>
+<body>
+
+
+<h1>GameShooter - Game Rules</h1>
+
+<div class="rules-section">
+    <h2>Objective</h2>
+    <p>The main objective of GameShooter is to defeat all enemies and achieve the highest score possible.</p>
+</div>
+
+<div class="rules-section">
+    <h2>Gameplay</h2>
+    <ol>
+        <li>Use the arrow keys to move your character.</li>
+        <li>Use the spacebar or mouse click to shoot.</li>
+        <li>Avoid enemy.</li>
+        <li>Collect power-ups to enhance your abilities.</li>
+    </ol>
+</div>
+
+<div class="rules-section">
+    <h2>Scoring</h2>
+    <ul>
+        <li>Each enemy defeated earns you points.</li>
+        <li>Collecting power-ups may grant bonus points.</li>
+        <li>Surviving longer increases your score multiplier.</li>
+    </ul>
+</div>
+
+<div class="rules-section">
+    <h2>Game Over</h2>
+    <p>The game ends when you have collision with enemy.</p>
+</div>
+
+<div style="display: flex; gap: 10px;">
+    <button type="button" onclick="location.href='pageStart.html'">Back Home</button>
+    <button type="button" onclick="location.href='gameshooter.html'">Play Games</button>
+</div>
+
+<canvas id="shootingStarsCanvas" style="position: fixed; top: 0; left: 0; z-index: -1;"></canvas>
+    <script>
+         const canvas = document.getElementById('shootingStarsCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        function createShootingStar() {
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                length: Math.random() * 100 + 50,
+                opacity: Math.random(),
+                speedX: Math.random() * 3 - 1.5,
+                speedY: Math.random() * 3 - 1.5,
+                color: `hsl(${Math.random() * 360}, 100%, 50%)`
+            };
+        }
+
+        let shootingStars = [];
+        for (let i = 0; i < 20; i++) {
+            shootingStars.push(createShootingStar());
+        }
+
+        function drawShootingStar(star) {
+            ctx.beginPath();
+            ctx.moveTo(star.x, star.y);
+            ctx.lineTo(star.x + star.length * star.speedX, star.y + star.length * star.speedY);
+            ctx.strokeStyle = star.color;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function updateShootingStar(star) {
+            star.x += star.speedX;
+            star.y += star.speedY;
+
+            if (star.x < 0 || star.x > canvas.width || star.y < 0 || star.y > canvas.height) {
+                star.x = Math.random() * canvas.width;
+                star.y = Math.random() * canvas.height;
+                star.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            shootingStars.forEach(star => {
+                drawShootingStar(star);
+                updateShootingStar(star);
+            });
+        }
+
+        animate();
+    </script>
+
+</body>
+</html>

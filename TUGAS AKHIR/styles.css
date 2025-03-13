@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+* {
+    padding: 0;
+    box-sizing: border-box;
+}
+@keyframes neon {
+    0%, 100% {
+        text-shadow: 
+            0 0 5px #fff, 
+            0 0 10px  #ff00ff,
+            0 0 20px #ff00ff, 
+            0 0 30px #ff00ff, 
+            0 0 40px #ff00ff, 
+            0 0 50px #ff00ff, 
+            0 0 60px #ff00ff;
+    }
+    50% {
+        text-shadow: 
+            0 0 5px #fff, 
+            0 0 10px  #ff00ff,
+            0 0 20px #ff00ff, 
+            0 0 30px #ff00ff, 
+            0 0 40px #ff00ff, 
+            0 0 50px #ff00ff, 
+            0 0 60px #ff00ff;
+    }
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 10dp;
+    animation: neon 1.5s infinite alternate;
+}
+
+
+body {
+    text-align: center;
+    font-family: 'Press Start 2P', cursive;
+    background-color: #000;
+    color: #fff;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+button {
+    font-family: 'Press Start 2P', cursive;
+    background-color: #ff0000;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+button:hover {
+    background-color: #cc0000;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Press Start 2P', cursive;
+    color: #ff00ff; /* Bright magenta color */
+    animation: neon 1.5s infinite alternate;
+}
+
+canvas {
+    background-color: #000;
+    display: block;
+    margin: 20px auto;
+    border: 2px solid #ff00ff; /* Bright magenta color */
+    border-radius: 0; /* No border radius for a more pixelated look */
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.5); /* Magenta shadow */
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    canvas {
+        width: 90%;
+        height: auto;
+    }
+}

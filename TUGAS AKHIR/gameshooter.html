@@ -4,30 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Shooter</title>
-    <style>
-        body {
-            text-align: center;
-            font-family: poppins;
-            background-color: #222;
-            color: white;
-        }
-        canvas {
-            background-color: black;
-            display: block;
-            margin: 20px auto;
-        }
-
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Game Shooter Sederhana</h1>
-    <p>Gunakan tombol kiri & kanan untuk bergerak, spasi untuk menembak</p>
-    <p id="score">Skor: 0</p> <!-- Score Display -->
+    <h1>BALL SHOOTER</h1>
+    <p>Use the left & right keys to move, space to shoot</p>
+    <p id="score">Score: 0</p> <!-- Score Display -->
+    <div style="display: flex; gap: 10px;">
+        <button type="button" onclick="location.href='pageStart.html'">Back Home</button>
+        <button type="button" onclick="gameshooter.html">Restart</button> <!-- Restart Button -->
+        <button type="button" id="pauseButton">Pause</button> <!-- Pause Button -->
+    </div>
     <canvas id="gameCanvas" width="1024" height="768"></canvas>
+
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         const scoreDisplay = document.getElementById("score");
+        const pauseButton = document.getElementById("pauseButton");
 
         let player = {
             x: canvas.width / 2,
@@ -46,27 +40,38 @@
         let bullets = [];
         let score = 0;
         let keys = {};
-        let canShoot = true; // Untuk cooldown tembakan
+        let canShoot = true; // For shooting cool down
+        let isPaused = false; // Pause state
 
         window.addEventListener("keydown", (e) => {
             keys[e.code] = true;
 
-            // Tambahkan cooldown untuk tembakan
-            if (e.code === "Space" && canShoot) {
-                bullets.push({ 
-                    x: player.x, 
+            // Add cool down for shooting
+            if (e.code === "Space" && canShoot && !isPaused) {
+                bullets.push({
+                    x: player.x,
                     y: player.y - player.size / 2,
-                    radius: 7, 
-                    speed: 7 
+                    radius: 7,
+                    speed: 7
                 });
                 canShoot = false;
-                setTimeout(() => canShoot = true, 200); // Delay 200ms sebelum bisa menembak lagi
+                setTimeout(() => canShoot = true, 200); // 200ms delay before shooting again
             }
         });
 
         window.addEventListener("keyup", (e) => delete keys[e.code]);
 
+        pauseButton.addEventListener("click", () => {
+            isPaused = !isPaused;
+            pauseButton.textContent = isPaused ? "Resume" : "Pause";
+            if (!isPaused) {
+                update();
+            }
+        });
+
         function update() {
+            if (isPaused) return;
+
             if (keys["ArrowLeft"] && player.x > 0) {
                 player.x -= player.speed;
             }
@@ -79,12 +84,12 @@
 
                 if (
                     bullet.y - bullet.radius < enemy.y + enemy.size &&
-                    bullet.x > enemy.x - enemy.size &&
+                    bullet.x > enemy.x &&
                     bullet.x < enemy.x + enemy.size
                 ) {
                     bullets.splice(index, 1);
                     score += 1;
-                    scoreDisplay.textContent = "Skor: " + score;
+                    scoreDisplay.textContent = "Score: " + score;
 
                     enemy.x = Math.random() * (canvas.width - 200) + 100;
                     enemy.y = Math.random() * 100;
@@ -96,21 +101,25 @@
             });
 
             enemy.y += enemy.speed;
-            enemy.x += (Math.random() - 0.5) * 2; // Musuh gerak horizontal
+            // Keep enemy within canvas bounds
+            if (enemy.x < 0) {
+                enemy.x = 0;
+            } else if (enemy.x > canvas.width - enemy.size) {
+                enemy.x = canvas.width - enemy.size;
+            }
 
             if (enemy.y > canvas.height) {
                 enemy.x = Math.random() * (canvas.width - 200) + 100;
                 enemy.y = Math.random() * 100;
             }
 
-            // Game Over jika musuh menyentuh player
+            // Game Over if enemy touches player
             if (
-                enemy.y + enemy.size > player.y && 
+                enemy.y + enemy.size > player.y &&
                 enemy.x > player.x - player.size &&
                 enemy.x < player.x + player.size
             ) {
-                alert("Game Over! Skor kamu: " + score);
-                document.location.reload();
+                window.location.href = "pagegameover.html"; // Redirect to pageStart.html
             }
 
             draw();
@@ -120,7 +129,8 @@
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = "blue";
+            // Draw player
+            ctx.fillStyle = "deepskyblue";
             ctx.beginPath();
             ctx.moveTo(player.x, player.y);
             ctx.lineTo(player.x - player.size, player.y + player.size);
@@ -128,7 +138,8 @@
             ctx.closePath();
             ctx.fill();
 
-            ctx.fillStyle = "purple";
+            // Draw enemy (Pac-Man shape)
+            ctx.fillStyle = "orange";
             ctx.beginPath();
             for (let i = 0; i < 5; i++) {
                 let angle = (Math.PI * 2 / 5) * i - Math.PI / 2;
@@ -139,6 +150,7 @@
             ctx.closePath();
             ctx.fill();
 
+            // Draw bullets
             ctx.fillStyle = "red";
             bullets.forEach(bullet => {
                 ctx.beginPath();
